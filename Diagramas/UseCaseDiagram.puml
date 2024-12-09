@@ -1,0 +1,34 @@
+@startuml
+left to right direction
+'skinparam linetype ortho
+
+actor "Usuário" as user
+actor "Admin" as admin
+actor "Advogado" as ad
+actor "Assistente\n Jurídico" as aj
+actor "Administrador\n do Escritório" as ae
+
+rectangle "Sistema LexFile" {
+    usecase "Buscar / Recuperar\n Documentos" as us0
+    usecase "Cadastrar\n Novo Caso" as us1
+    usecase "Aprovar / Rejeitar Caso" as us2
+    usecase "Adicionar\n Documentos ao Caso" as us3
+    usecase "Aprovar / Rejeitar\n Extensão de prazo" as us4
+    usecase "Gerencia Permissões\n dos usuários" as us5
+
+
+}
+
+user --> us0
+ad -l-|> user
+ae -l-|> user
+aj -r-|> user
+
+ad --> us1
+ae --> us2
+aj --> us3
+aj --> us4
+
+admin --> us5
+
+@enduml

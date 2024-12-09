@@ -1,0 +1,58 @@
+@startuml
+
+actor "Assistente\n Jurídico" as aj #lightgrey
+actor "Gestor\n Jurídico" as gj #lightgrey
+participant "Class Caso" as casoCL #lightgrey
+database "Caso DB" as casoDB #lightgrey
+
+autonumber
+
+aj-> casoCL : listPendentes();
+activate aj #lightgrey
+activate casoCL  #lightgrey
+casoCL -> casoDB :getPendentesAprov();
+activate casoDB  #lightgrey
+casoDB -> casoCL :return(ListaPendentesAprov);
+deactivate casoDB  #lightgrey
+casoCL  -> aj : return(ListaPendentesAprov);
+
+aj-> casoCL :requestNovoPrazo(Caso);
+casoCL -> casoDB :setRequestNovoPrazo();
+activate casoDB  #lightgrey
+casoDB -> casoCL :response("Criada");
+deactivate casoDB  #lightgrey
+casoCL  -> aj : return("Criada solicitação de novo prazo");
+deactivate casoCL  #lightgrey
+deactivate aj #lightgrey
+
+...
+
+gj -> casoCL : listRequestAltPrazo();
+activate gj #lightgrey
+activate casoCL  #lightgrey
+casoCL -> casoDB :getListRequests();
+activate casoDB  #lightgrey
+casoDB -> casoCL :return(ListaRequestAltPrazo);
+deactivate casoDB  #lightgrey
+casoCL  -> gj : return(ListaRequestAltPrazo);
+loop Para cada request
+    alt Aprovado
+        gj -> casoCL : AprovadoNovoPrazo(Caso);
+        casoCL -> casoDB :setNovoPrazo(Caso);
+        activate casoDB  #lightgrey
+        casoDB  -> casoCL :response("Configurado");
+        deactivate casoDB  #lightgrey
+        casoCL  -> gj : return("Novo prazo de aprovação configurado");
+    else Reprovado
+        gj -> casoCL : ReprovadoNovoPrazo(Caso);
+        casoCL -> casoDB :deleteRequest(Caso);
+        activate casoDB  #lightgrey
+        casoDB  -> casoCL : response("Requisição Deletada");
+        deactivate casoDB  #lightgrey
+        casoCL  -> gj : return("Novo prazo reprovado");
+        deactivate casoCL  #lightgrey
+        deactivate gj #lightgrey
+    end
+end
+
+@enduml

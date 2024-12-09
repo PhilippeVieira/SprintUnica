@@ -1,0 +1,82 @@
+@startuml
+
+actor "Advogado\n" as ad #lightgrey
+actor "Assistente\n Jurídico" as aj #lightgrey
+actor "Administrador\n do Escritório" as ae #lightgrey
+
+participant "Class Caso" as casoCL #lightgrey
+database "Caso DB" as casoDB #lightgrey
+database "Documentos DB" as docDB #lightgrey
+
+autonumber
+ad -> casoCL : newCaso();
+activate ad  #lightgrey
+
+activate casoCL  #lightgrey
+
+casoCL -> casoDB : addCaso();
+activate casoDB  #lightgrey
+casoDB  -> casoCL : response("Adicionado");
+deactivate casoDB  #lightgrey
+casoCL  -> ad : return("Caso Criado. Aguardando a aprovação do Assistente");
+deactivate casoCL  #lightgrey
+deactivate ad
+
+...
+
+aj-> casoCL : listPendentes();
+activate aj #lightgrey
+activate casoCL  #lightgrey
+casoCL -> casoDB :getPendentesAprov();
+activate casoDB  #lightgrey
+casoDB -> casoCL :return(ListaPendentesAprov);
+deactivate casoDB  #lightgrey
+casoCL  -> aj : return(ListaPendentesAprov);
+
+alt Aprovado
+    aj -> casoCL : Aprovado();
+    casoCL -> casoDB :setAprovação();
+    activate casoDB  #lightgrey
+    casoDB  -> casoCL : response("Aprovado");
+    deactivate casoDB  #lightgrey
+    casoCL  -> aj : return("Caso Aprovado");
+else Rejeitado
+    aj -> casoCL : Rejeitado();
+    casoCL -> casoDB :deleteCaso();
+    activate casoDB  #lightgrey
+    casoDB  -> casoCL : response("Deletado");
+    deactivate casoDB  #lightgrey
+    casoCL  -> aj : return("Caso Deletado");
+    deactivate casoCL  #lightgrey
+    deactivate aj #lightgrey
+end
+
+...
+
+ae -> casoCL : findCaso();
+activate ae #lightgrey
+activate casoCL  #lightgrey
+casoCL -> casoDB :getCaso();
+activate casoDB  #lightgrey
+
+alt Encontrado
+    casoDB -> casoCL :response("Encontrado");
+
+    casoCL  -> ae : return( casoSelecionado );
+    loop "while tem novo documento"
+        ae -> casoCL :newDocumento();
+        casoCL  -> docDB :addDocumento();
+        activate docDB  #lightgrey
+        docDB -> casoCL :response("Adicionado");
+        deactivate docDB  #lightgrey
+        casoCL  -> ae : return("Documento Adicionado para o caso");
+    end
+else Não Existe
+    casoDB -> casoCL :response(Não Existe);
+    deactivate casoDB  #lightgrey
+    casoCL  -> ae : return("Caso Procurado não existe");
+    deactivate casoCL  #lightgrey
+    deactivate ae #lightgrey
+end
+
+@enduml

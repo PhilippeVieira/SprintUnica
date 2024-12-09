@@ -1,0 +1,21 @@
+@startuml
+
+actor "Usuário\n" as user #lightgrey
+database "Documentos DB" as docDB #lightgrey
+
+autonumber
+user --> docDB :findDocumento();
+activate user #lightgrey
+activate docDB  #lightgrey
+
+alt Encontrado
+    docDB -> user :response("Encontrado");
+    user --> docDB :getDocumento();
+    docDB -> user :return(Documento);
+else Não Existe
+    docDB -> user :response("Não Existe");
+    deactivate docDB  #lightgrey
+end
+deactivate user #lightgrey
+
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+left to right direction
+'skinparam linetype ortho
+
+frame "LexFile" {
+  package "Controller" {
+    [CasoController]
+    [PerfilController]
+    [UsuarioController]
+  }
+  package "Model" {
+    [CasoModel]
+    [PerfilModel]
+    [UsuarioModel]
+  }
+  package "JPA Repository" as Repository {
+    [CasoRepository]
+    [PerfilRepository]
+    [UsuarioRepository]
+  }
+  database "DATABASE" {
+    [CasoTable]
+    [PerfilTable]
+    [UsuarioTable]
+  }
+}
+
+CasoController -- CasoModel
+PerfilController -- PerfilModel
+UsuarioController -- PerfilModel
+UsuarioController -- UsuarioModel
+
+CasoModel -- CasoRepository
+PerfilModel -- PerfilRepository
+UsuarioModel -- UsuarioRepository
+
+CasoRepository -- CasoTable
+PerfilRepository -- PerfilTable
+UsuarioRepository -- UsuarioTable
+
+
+Controller --u-->> "CLIENT WEB APP" :HTTPS
+
+Model -->> Controller
+Repository -->> Model
+DATABASE -->> Repository
+
+@enduml

@@ -1,0 +1,52 @@
+@startuml
+
+actor "Usuário" as user #lightgrey
+actor "Admin" as admin #lightgrey
+participant "Class Perfil" as perfilCL #lightgrey
+database "Perfil DB" as perfilDB #lightgrey
+
+autonumber
+
+user --> perfilCL :requestPermissao(user);
+activate user #lightgrey
+activate perfilCL  #lightgrey
+perfilCL --> perfilDB :serRequestPermissao(user);
+activate perfilDB  #lightgrey
+perfilDB --> perfilCL :response("Requisição Criada");
+deactivate perfilDB  #lightgrey
+perfilCL --> user :return("Requisição registrada. Aguardando aprovação do Administrador");
+deactivate perfilCL  #lightgrey
+deactivate user #lightgrey
+
+...
+
+admin --> perfilCL :listRequestsPermissao();
+activate admin #lightgrey
+activate perfilCL  #lightgrey
+perfilCL --> perfilDB :listRequestsPermissao();
+activate perfilDB  #lightgrey
+perfilDB --> perfilCL :return(ListaRequests);
+deactivate perfilDB  #lightgrey
+perfilCL --> admin :return(ListaRequests);
+loop Para cada item
+ alt Aprovado
+        admin -> perfilCL : AprovarPermissao(user);
+        perfilCL -> perfilDB :setPermissão(user);
+        activate perfilDB  #lightgrey
+        perfilDB  -> perfilCL :response("Configurada");
+        deactivate perfilDB  #lightgrey
+        perfilCL  -> admin : return("Configurada a permissão para o Usuário");
+    else Reprovado
+        admin -> perfilCL : ReprovarPermissao(user);
+        perfilCL -> perfilDB :deleteRequest(user);
+        activate perfilDB  #lightgrey
+        perfilDB  -> perfilCL : response("Requisição Deletada");
+        deactivate perfilDB  #lightgrey
+        perfilCL  -> admin : return("Permissão rejeitada para o Usuário");
+        deactivate perfilCL  #lightgrey
+        deactivate admin #lightgrey
+    end
+end
+
+
+@enduml

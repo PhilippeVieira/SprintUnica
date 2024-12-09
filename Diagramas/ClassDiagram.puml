@@ -1,0 +1,25 @@
+@startuml
+left to right direction
+skinparam linetype ortho
+
+class Caso {
+    - caso String
+    - data Date
+    - hora Time
+    - image String
+    - descrição String
+}
+
+class Perfil{
+    - nome String
+}
+
+class Usuario{
+    - username String
+    - password String
+
+    -perfil() :Set<Perfil>
+}
+
+Usuario -- Perfil
+@enduml
